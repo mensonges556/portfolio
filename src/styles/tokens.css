@@ -1,0 +1,74 @@
+/* ------------------------------------------------------------------
+   Design system tokens — "Editorial Noir"
+   Single source of truth for colour, type, spacing and motion.
+   ------------------------------------------------------------------ */
+
+:root {
+  /* ---- Colour ---------------------------------------------------- */
+  --background: #08080a;
+  --surface: #0e0e12;
+  --surface-raised: #14141a;
+  --foreground: #f2f0ee;
+  --muted: #8a8a92;
+  --faint: #55555c;
+  --line: rgb(242 240 238 / 0.1);
+  --line-strong: rgb(242 240 238 / 0.22);
+
+  --accent: #ffa9ff;
+  --accent-soft: rgb(255 169 255 / 0.16);
+  --accent-glow: rgb(255 169 255 / 0.08);
+
+  /* ---- Type ------------------------------------------------------ */
+  --font-sans: 'Inter Tight', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-serif: 'Instrument Serif', 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  --fs-display: clamp(4rem, 15.5vw, 17rem);
+  --fs-h1: clamp(2.75rem, 8.5vw, 9rem);
+  --fs-h2: clamp(2rem, 5.2vw, 5rem);
+  --fs-h3: clamp(1.5rem, 2.6vw, 2.5rem);
+  --fs-lead: clamp(1.15rem, 1.9vw, 1.85rem);
+  --fs-body: clamp(0.95rem, 1.05vw, 1.0625rem);
+  --fs-label: clamp(0.625rem, 0.72vw, 0.6875rem);
+
+  --tracking-display: -0.045em;
+  --tracking-tight: -0.02em;
+  --tracking-label: 0.18em;
+
+  /* ---- Space ----------------------------------------------------- */
+  --gutter: clamp(1.25rem, 4.5vw, 5rem);
+  --section-y: clamp(6rem, 14vh, 13rem);
+  --rule: 1px;
+
+  /* ---- Motion ---------------------------------------------------- */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-overshoot: cubic-bezier(0.34, 1.28, 0.44, 1);
+  --dur-xs: 180ms;
+  --dur-sm: 280ms;
+  --dur-md: 520ms;
+  --dur-lg: 900ms;
+
+  /* ---- Layers ---------------------------------------------------- */
+  --z-grain: 60;
+  --z-cursor: 90;
+  --z-nav: 70;
+  --z-loader: 100;
+}
+
+/* Tailwind v4 theme bridge — exposes tokens as utilities
+   (text-accent, font-mono, border-line, …). */
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
+  --font-mono: var(--font-mono);
+}
