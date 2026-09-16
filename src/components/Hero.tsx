@@ -1,197 +1,299 @@
-import { motion, useTransform, type MotionValue } from 'motion/react'
-import { EASE_IN_OUT, EASE_OUT } from '../lib/motion'
-import { hero, site, ui } from '../data/site'
-import { usePointerParallax } from '../hooks/usePointerParallax'
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
+import {
+  motion,
+  useAnimate,
+  useMotionValue,
+  useMotionValueEvent,
+  useTransform,
+  animate as motionAnimate,
+  type MotionValue,
+} from 'motion/react'
+import logoKarla from '../../Fichier 10.svg'
+import Aurora from './Aurora'
+import { GridBackground } from './GridBackground'
+import { NAV } from '../config/nav'
+import { LogoMark, BurgerButton, MobileMenu } from './MobileMenu'
+import { Pointer } from './ui/pointer-highlight'
 
-const LETTERS = site.name.toUpperCase().split('')
-/** Depth factor per letter — the wordmark reads as four separate planes. */
-const DEPTH = [1, 0.45, -0.45, -1]
+const MOBILE_NAV = NAV.map((item) => ({ label: item.label, href: item.href }))
 
-export function Hero({ ready }: { ready: boolean }) {
-  const { x, y } = usePointerParallax()
+const ease = [0.22, 1, 0.36, 1] as const
+const scrubEase = [0.16, 1, 0.3, 1] as const
+const dragEase = [0.2, 0.8, 0.2, 1] as const
+const NAV_FROM = { x: 64, y: -110 }
 
-  const glowX = useTransform(x, [-0.5, 0.5], ['-18%', '18%'])
-  const glowY = useTransform(y, [-0.5, 0.5], ['-14%', '14%'])
+function OpacityField({ value }: { value: MotionValue<number> }) {
+  const [pct, setPct] = useState(0)
+  useMotionValueEvent(value, 'change', (v) => setPct(Math.round(v)))
+  return <span className="ps-opacity-field">{pct}%</span>
+}
+
+function pointIn(
+  hero: HTMLElement,
+  el: HTMLElement,
+  ox: number,
+  oy: number,
+) {
+  const a = el.getBoundingClientRect()
+  const h = hero.getBoundingClientRect()
+  return { x: a.left - h.left + ox, y: a.top - h.top + oy }
+}
+
+type HeroProps = {
+  desktopNavHeaderRef?: RefObject<HTMLElement | null>
+  desktopNavGrabRef?: RefObject<HTMLElement | null>
+}
+
+export function Hero({ desktopNavHeaderRef, desktopNavGrabRef }: HeroProps) {
+  const heroRef = useRef<HTMLDivElement>(null)
+  const navElRef = useRef<HTMLElement>(null)
+  const navGrabRef = useRef<HTMLDivElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const trackRef = useRef<HTMLDivElement>(null)
+  const [cursorRef, animate] = useAnimate()
+  const [navReady, setNavReady] = useState(false)
+  const [showBar, setShowBar] = useState(true)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const closeMenu = useCallback(() => setMenuOpen(false), [])
+
+  const opacity = useMotionValue(0)
+  const layerOpacity = useTransform(opacity, [0, 100], [0, 1])
+  const knobLeft = useTransform(opacity, [0, 100], ['0%', '100%'])
+
+  useEffect(() => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduced) {
+      opacity.set(100)
+      setNavReady(true)
+      setShowBar(false)
+      const nav = navElRef.current
+      const desktopNav = desktopNavHeaderRef?.current
+      if (nav) animate(nav, { opacity: 1, x: 0, y: 0 }, { duration: 0 })
+      if (desktopNav) {
+        animate(desktopNav, { opacity: 1, x: 0, y: 0 }, { duration: 0 })
+        desktopNav.style.pointerEvents = ''
+      }
+      return
+    }
+
+    let cancelled = false
+    const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
+    const run = async () => {
+      await wait(280)
+      await new Promise((r) => requestAnimationFrame(() => r(null)))
+
+      const hero = heroRef.current
+      const cursor = cursorRef.current
+      const mobileNav = window.matchMedia('(max-width: 899px)').matches
+      const nav = mobileNav ? navElRef.current : desktopNavHeaderRef?.current ?? null
+      const navGrab = mobileNav
+        ? navGrabRef.current
+        : desktopNavGrabRef?.current ?? null
+      const panel = panelRef.current
+      const track = trackRef.current
+      if (!hero || !cursor || !panel || !track || cancelled) return
+
+      if (nav) {
+        nav.style.pointerEvents = 'none'
+        await animate(
+          nav,
+          { opacity: 0, x: NAV_FROM.x, y: NAV_FROM.y, scale: 1 },
+          { duration: 0 },
+        )
+      }
+      if (cancelled) return
+
+      const startX = hero.clientWidth * 0.48
+      const startY = hero.clientHeight * 0.5
+      await animate(
+        cursor,
+        { opacity: 1, x: startX, y: startY },
+        { duration: 0.32, ease },
+      )
+      if (cancelled) return
+      await wait(100)
+
+      if (nav && navGrab) {
+        const pick = pointIn(
+          hero,
+          navGrab,
+          navGrab.offsetWidth - 22,
+          navGrab.offsetHeight * 0.55,
+        )
+        await animate(cursor, { x: pick.x, y: pick.y }, { duration: 0.55, ease })
+        if (cancelled) return
+
+        await animate(nav, { opacity: 1, scale: 1.03 }, { duration: 0.14 })
+        await animate(cursor, { scale: 0.88 }, { duration: 0.12 })
+        await wait(70)
+        if (cancelled) return
+
+        const drop = { x: pick.x - NAV_FROM.x, y: pick.y - NAV_FROM.y }
+        await Promise.all([
+          animate(cursor, { x: drop.x, y: drop.y }, { duration: 0.78, ease: dragEase }),
+          animate(nav, { x: 0, y: 0, scale: 1 }, { duration: 0.78, ease: dragEase }),
+        ])
+        if (cancelled) return
+
+        await animate(cursor, { scale: 1 }, { duration: 0.16 })
+        nav.style.pointerEvents = ''
+        setNavReady(true)
+        await wait(180)
+      } else {
+        setNavReady(true)
+      }
+      if (cancelled) return
+
+      await animate(panel, { opacity: 0, y: 14, scale: 0.97, filter: 'blur(8px)' }, { duration: 0 })
+      await animate(
+        panel,
+        { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' },
+        {
+          opacity: { duration: 0.52, ease },
+          y: { duration: 0.55, ease },
+          scale: { duration: 0.55, ease },
+          filter: { duration: 0.42, ease },
+        },
+      )
+      if (cancelled) return
+
+      await wait(80)
+      const grabY = track.offsetHeight * 0.5
+      const pick = pointIn(hero, track, 4, grabY)
+      await animate(cursor, { x: pick.x, y: pick.y }, { duration: 0.32, ease })
+      if (cancelled) return
+
+      await animate(cursor, { scale: 0.88 }, { duration: 0.08 })
+      await wait(40)
+      if (cancelled) return
+
+      const drop = pointIn(hero, track, track.offsetWidth - 4, grabY)
+      await Promise.all([
+        motionAnimate(opacity, 100, { duration: 0.85, ease: scrubEase }),
+        animate(cursor, { x: drop.x, y: drop.y }, { duration: 0.85, ease: scrubEase }),
+      ])
+      if (cancelled) return
+
+      await animate(cursor, { scale: 1 }, { duration: 0.12 })
+      await wait(280)
+      if (cancelled) return
+
+      await Promise.all([
+        animate(
+          panel,
+          { opacity: 0, scale: 0.86, y: 22, filter: 'blur(10px)' },
+          {
+            opacity: { duration: 0.52, ease: [0.4, 0, 0.2, 1] },
+            scale: { duration: 0.58, ease: [0.22, 1, 0.36, 1] },
+            y: { duration: 0.58, ease: [0.22, 1, 0.36, 1] },
+            filter: { duration: 0.46, ease: [0.45, 0, 1, 1] },
+          },
+        ),
+        animate(
+          cursor,
+          { x: drop.x + 32, y: drop.y + 40, opacity: 0, scale: 0.9 },
+          {
+            x: { duration: 0.52, ease },
+            y: { duration: 0.52, ease },
+            scale: { duration: 0.45, ease },
+            opacity: { duration: 0.4, delay: 0.12, ease: [0.4, 0, 1, 1] },
+          },
+        ),
+      ])
+      if (!cancelled) setShowBar(false)
+    }
+
+    void run()
+    return () => {
+      cancelled = true
+    }
+  }, [animate, cursorRef, opacity, desktopNavHeaderRef, desktopNavGrabRef])
 
   return (
-    <section
-      id="hero"
-      className="relative flex min-h-[100svh] flex-col justify-between overflow-hidden pt-24 pb-10 sm:pt-28 md:pb-12 lg:pb-24"
+    <div
+      id="accueil"
+      ref={heroRef}
+      className="relative w-full min-w-0 min-h-[100svh] overflow-x-clip pb-6 sm:pb-8"
     >
-      {/* Pointer-tracked accent halo — the only large use of the accent colour */}
+      <div className="absolute inset-0 z-0">
+        <Aurora
+          colorStops={['#ffc9ec', '#e179be', '#ffc9ec']}
+          blend={0.5}
+          amplitude={1.0}
+          speed={0.5}
+          lightMode
+        />
+      </div>
+      <GridBackground />
+
       <motion.div
+        ref={cursorRef}
+        className="hero-intro-cursor"
+        initial={{ opacity: 0, x: 0, y: 0, scale: 1 }}
         aria-hidden="true"
-        className="pointer-events-none absolute top-1/2 left-1/2 h-[85vmax] w-[85vmax] -translate-x-1/2 -translate-y-1/2"
-        style={{
-          x: glowX,
-          y: glowY,
-          background:
-            'radial-gradient(circle at 50% 50%, rgb(255 169 255 / 0.13) 0%, rgb(255 169 255 / 0.04) 32%, transparent 62%)',
-        }}
-        initial={{ opacity: 0, scale: 0.85 }}
-        animate={ready ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.85 }}
-        transition={{ duration: 1.8, ease: EASE_OUT, delay: 0.2 }}
-      />
+      >
+        <Pointer className="h-7 w-7 text-[#830012] -rotate-90" />
+      </motion.div>
 
-      <GridLines ready={ready} />
+      <motion.nav
+        ref={navElRef}
+        className="site-nav nav-mobile-only absolute top-0 left-0 right-0 z-30"
+        initial={{ opacity: 0, x: NAV_FROM.x, y: NAV_FROM.y, scale: 1 }}
+        style={{ pointerEvents: navReady ? 'auto' : 'none' }}
+      >
+        <LogoMark className="shrink-0" />
 
-      {/* ---- Eyebrow ------------------------------------------------ */}
-      <div className="shell relative">
-        <motion.div
-          className="flex items-baseline justify-between gap-4 border-b border-[var(--line)] pb-4"
-          initial={{ opacity: 0, y: -10 }}
-          animate={ready ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7, ease: EASE_OUT, delay: 0.35 }}
-        >
-          <span className="label">
-            {site.volume} <span className="text-[var(--faint)]">/ {site.year}</span>
-          </span>
-          <span className="label hidden text-[var(--faint)] lg:block">
-            {site.location.coordinates}
-          </span>
-          <span className="label label--accent whitespace-nowrap">
-            <span className="sm:hidden">{site.availabilityShort}</span>
-            <span className="hidden sm:inline">{site.availability}</span>
-          </span>
-        </motion.div>
-      </div>
-
-      {/* ---- Wordmark ----------------------------------------------- */}
-      <div className="shell relative flex flex-1 items-center py-10">
-        {/* Real heading for assistive tech; the spread letters are decorative. */}
-        <h1 className="sr-only">
-          {site.name} — {site.role}. {site.discipline}
-        </h1>
-
-        <div aria-hidden="true" className="w-full">
-          <div className="flex w-full justify-between">
-            {LETTERS.map((letter, index) => (
-              <Letter
-                key={`${letter}-${index}`}
-                letter={letter}
-                depth={DEPTH[index % DEPTH.length]}
-                index={index}
-                ready={ready}
-                pointerX={x}
-                pointerY={y}
-              />
-            ))}
-          </div>
+        <div ref={navGrabRef} className="flex items-center justify-end min-w-0">
+          <BurgerButton onClick={() => setMenuOpen(true)} />
         </div>
-      </div>
+      </motion.nav>
 
-      {/* ---- Foot of the scene -------------------------------------- */}
-      <div className="shell relative">
-        <motion.div
-          className="h-px w-full origin-left bg-[var(--line)]"
-          initial={{ scaleX: 0 }}
-          animate={ready ? { scaleX: 1 } : {}}
-          transition={{ duration: 1.4, ease: EASE_IN_OUT, delay: 0.75 }}
-        />
+      <MobileMenu open={menuOpen} onClose={closeMenu} items={MOBILE_NAV} />
 
-        <div className="grid-12 pt-6 sm:pt-8">
-          {/* Positioning statement */}
-          <motion.p
-            className="lead col-span-12 max-w-[38ch] text-pretty lg:col-span-5"
-            initial={{ opacity: 0, y: 20 }}
-            animate={ready ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.9, ease: EASE_OUT, delay: 0.95 }}
-          >
-            {hero.tagline}{' '}
-            <span className="serif text-[var(--accent)]">{hero.taglineAccent}</span>.
-          </motion.p>
+      <div className="relative z-20 min-h-[100svh] min-w-0 w-full flex flex-col">
+        <div className="h-[64px] sm:h-[72px] shrink-0" />
 
-          {/* Disciplines */}
-          <motion.ul
-            className="col-span-12 mt-10 flex flex-wrap gap-x-8 gap-y-2 lg:col-span-4 lg:col-start-7 lg:mt-0 lg:flex-col lg:gap-y-1.5"
-            initial={{ opacity: 0, y: 20 }}
-            animate={ready ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.9, ease: EASE_OUT, delay: 1.05 }}
-          >
-            {hero.disciplines.map((item, i) => (
-              <li key={item} className="label flex items-baseline gap-3">
-                <span className="text-[var(--faint)]">0{i + 1}</span>
-                <span>{item}</span>
-              </li>
-            ))}
-          </motion.ul>
-
-          {/* Scroll indicator */}
-          <motion.div
-            className="col-span-12 mt-10 flex items-center gap-4 lg:col-span-2 lg:col-start-11 lg:mt-0 lg:justify-end"
-            initial={{ opacity: 0 }}
-            animate={ready ? { opacity: 1 } : {}}
-            transition={{ duration: 0.9, ease: EASE_OUT, delay: 1.2 }}
-          >
-            <span className="label !text-[0.5625rem]">{ui.scrollHint}</span>
-            <div className="relative h-10 w-px overflow-hidden bg-[var(--line)] lg:h-14">
-              <motion.div
-                className="absolute inset-x-0 h-1/2 bg-[var(--accent)]"
-                animate={{ y: ['-100%', '200%'] }}
-                transition={{ duration: 2.2, ease: EASE_IN_OUT, repeat: Infinity, repeatDelay: 0.3 }}
+        <div className="hero-shell">
+          <div className="hero-media-slot" id="projets">
+            <div className="hero-brand">
+              <motion.img
+                src={logoKarla}
+                alt="Karla"
+                className="hero-logo"
+                style={{ opacity: layerOpacity }}
               />
+              <motion.p
+                className="hero-tagline"
+                style={{ opacity: layerOpacity }}
+              >
+                Sharp ideas only.
+              </motion.p>
             </div>
-          </motion.div>
+          </div>
+
+          {showBar && (
+            <div className="ps-opacity-wrap">
+              <motion.div
+                ref={panelRef}
+                className="ps-opacity"
+                initial={{ opacity: 0, y: 14, scale: 0.97, filter: 'blur(8px)' }}
+                aria-hidden="true"
+              >
+                <div className="ps-opacity-row">
+                  <span className="ps-opacity-label">Opacité</span>
+                  <OpacityField value={opacity} />
+                </div>
+                <div ref={trackRef} className="ps-opacity-track">
+                  <div className="ps-opacity-rail" />
+                  <motion.div className="ps-opacity-knob" style={{ left: knobLeft }} />
+                </div>
+              </motion.div>
+            </div>
+          )}
         </div>
       </div>
-    </section>
-  )
-}
 
-function Letter({
-  letter,
-  depth,
-  index,
-  ready,
-  pointerX,
-  pointerY,
-}: {
-  letter: string
-  depth: number
-  index: number
-  ready: boolean
-  pointerX: MotionValue<number>
-  pointerY: MotionValue<number>
-}) {
-  const x = useTransform(pointerX, [-0.5, 0.5], [-16 * depth, 16 * depth])
-  const y = useTransform(pointerY, [-0.5, 0.5], [-10 * depth, 10 * depth])
-
-  return (
-    // Parallax lives outside the mask so the drift never gets clipped.
-    <motion.span className="block" style={{ x, y }}>
-      <span className="block overflow-hidden pb-[0.06em]">
-        <motion.span
-          className="block font-semibold uppercase"
-          style={{
-            fontSize: 'clamp(4.5rem, 26vw, 21rem)',
-            lineHeight: 0.8,
-            letterSpacing: '-0.02em',
-          }}
-          initial={{ y: '125%' }}
-          animate={ready ? { y: '0%' } : { y: '125%' }}
-          transition={{ duration: 1.15, ease: EASE_OUT, delay: 0.35 + index * 0.07 }}
-        >
-          {letter}
-        </motion.span>
-      </span>
-    </motion.span>
-  )
-}
-
-/** Four hairlines that draw down on load — the grid, made visible. */
-function GridLines({ ready }: { ready: boolean }) {
-  return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden lg:block">
-      {[20, 40, 60, 80].map((left, i) => (
-        <motion.div
-          key={left}
-          className="absolute top-0 h-full w-px origin-top bg-[var(--line)] opacity-60"
-          style={{ left: `${left}%` }}
-          initial={{ scaleY: 0 }}
-          animate={ready ? { scaleY: 1 } : { scaleY: 0 }}
-          transition={{ duration: 1.6, ease: EASE_IN_OUT, delay: 0.5 + i * 0.09 }}
-        />
-      ))}
     </div>
   )
 }

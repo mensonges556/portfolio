@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local sibling projects (not deployed)
+hm/
+hmm/
+old/
+x/
+inspo/
