@@ -1,43 +1,44 @@
 import type { RefObject } from 'react'
 import navLogoKarla from '../../LOGO KARLA.svg'
-import { NAV, NAV_SOCIALS } from '../config/nav'
-import { StaggeredMenu } from './StaggeredMenu'
+import { NAV } from '../config/nav'
+import GooeyNav from './GooeyNav'
+import './DesktopNav.css'
 
-const menuItems = NAV.map((item) => ({
+const items = NAV.map((item) => ({
   label: item.label,
-  ariaLabel: item.ariaLabel,
-  link: item.href,
-}))
-
-const socialItems = NAV_SOCIALS.map((item) => ({
-  label: item.label,
-  link: item.link,
+  href: item.href,
 }))
 
 type DesktopNavProps = {
   headerRef?: RefObject<HTMLElement | null>
-  toggleRef?: RefObject<HTMLButtonElement | null>
+  grabRef?: RefObject<HTMLElement | null>
 }
 
-export function DesktopNav({ headerRef, toggleRef }: DesktopNavProps) {
+export function DesktopNav({ headerRef, grabRef }: DesktopNavProps) {
   return (
     <div className="desktop-nav" aria-hidden={false}>
-      <StaggeredMenu
-        isFixed
-        position="right"
-        items={menuItems}
-        socialItems={socialItems}
-        displaySocials
-        displayItemNumbering
-        logoUrl={navLogoKarla}
-        colors={['#ffc9ec', '#e179be', '#830012']}
-        menuButtonColor="#830012"
-        openMenuButtonColor="#830012"
-        accentColor="#830012"
-        changeMenuColorOnOpen={false}
-        headerRef={headerRef}
-        toggleRef={toggleRef}
-      />
+      <header
+        ref={headerRef}
+        className="desktop-nav-header"
+        aria-label="Navigation principale"
+      >
+        <a href="#accueil" className="desktop-nav-logo" aria-label="Karla, accueil">
+          <img src={navLogoKarla} alt="Karla" draggable={false} width={110} height={34} />
+        </a>
+
+        <div ref={grabRef} className="desktop-nav-gooey">
+          <GooeyNav
+            items={items}
+            particleCount={15}
+            particleDistances={[90, 10]}
+            particleR={100}
+            initialActiveIndex={0}
+            animationTime={600}
+            timeVariance={300}
+            colors={[1, 2, 3, 1, 2, 3, 1, 4]}
+          />
+        </div>
+      </header>
     </div>
   )
 }

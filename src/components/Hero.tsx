@@ -9,8 +9,9 @@ import {
   type MotionValue,
 } from 'motion/react'
 import logoKarla from '../../Fichier 10.svg'
-import Aurora from './Aurora'
-import { GridBackground } from './GridBackground'
+import heroPortrait from '../../hero.png'
+import heroBg from '../../3D.png'
+import Grainient from './Grainient'
 import { NAV } from '../config/nav'
 import { LogoMark, BurgerButton, MobileMenu } from './MobileMenu'
 import { Pointer } from './ui/pointer-highlight'
@@ -214,19 +215,43 @@ export function Hero({ desktopNavHeaderRef, desktopNavGrabRef }: HeroProps) {
     <div
       id="accueil"
       ref={heroRef}
-      className="relative w-full min-w-0 min-h-[100svh] overflow-x-clip pb-6 sm:pb-8"
+      className="relative w-full min-w-0 min-h-[100svh] overflow-visible"
     >
-      <div className="absolute inset-0 z-0">
-        <Aurora
-          colorStops={['#ffc9ec', '#e179be', '#ffc9ec']}
-          blend={0.5}
-          amplitude={1.0}
-          speed={0.5}
-          lightMode
+      <div className="hero-bg absolute inset-0 z-0" aria-hidden="true">
+        <div className="hero-bg-grain">
+          <Grainient
+            color1="#fc81ff"
+            color2="#d3d3d3"
+            color3="#fc81ff"
+            timeSpeed={0.25}
+            colorBalance={0.0}
+            warpStrength={1.0}
+            warpFrequency={5.0}
+            warpSpeed={2.0}
+            warpAmplitude={50.0}
+            blendAngle={0.0}
+            blendSoftness={0.05}
+            rotationAmount={500.0}
+            noiseScale={2.0}
+            grainAmount={0.1}
+            grainScale={2.0}
+            grainAnimated={false}
+            contrast={1.5}
+            gamma={1.0}
+            saturation={1.0}
+            centerX={0.0}
+            centerY={0.0}
+            zoom={0.9}
+          />
+        </div>
+        <motion.img
+          src={heroBg}
+          alt=""
+          className="hero-bg-img"
+          draggable={false}
+          style={{ opacity: layerOpacity }}
         />
       </div>
-      <GridBackground />
-
       <motion.div
         ref={cursorRef}
         className="hero-intro-cursor"
@@ -294,6 +319,13 @@ export function Hero({ desktopNavHeaderRef, desktopNavGrabRef }: HeroProps) {
         </div>
       </div>
 
+      <motion.div
+        className="hero-peek-wrap"
+        style={{ opacity: layerOpacity }}
+        aria-hidden="true"
+      >
+        <img src={heroPortrait} alt="" className="hero-peek" draggable={false} />
+      </motion.div>
     </div>
   )
 }

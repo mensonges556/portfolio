@@ -7,14 +7,14 @@ import { ScrollBand } from './components/ScrollBand'
 
 export default function App() {
   const desktopNavHeaderRef = useRef<HTMLElement>(null)
-  const desktopNavToggleRef = useRef<HTMLButtonElement>(null)
+  const desktopNavGrabRef = useRef<HTMLElement>(null)
 
   return (
-    <div className="min-w-0 max-w-full overflow-x-clip">
-      <DesktopNav headerRef={desktopNavHeaderRef} toggleRef={desktopNavToggleRef} />
+    <div className="min-w-0 max-w-full">
+      <DesktopNav headerRef={desktopNavHeaderRef} grabRef={desktopNavGrabRef} />
       <Hero
         desktopNavHeaderRef={desktopNavHeaderRef}
-        desktopNavGrabRef={desktopNavToggleRef}
+        desktopNavGrabRef={desktopNavGrabRef}
       />
       <Curriculum />
       <ScrollBand />

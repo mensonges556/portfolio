@@ -1,6 +1,8 @@
 import { type ReactNode } from 'react'
 import { Brush, PenTool, Sparkles, Video } from 'lucide-react'
 import { motion } from 'motion/react'
+import simsPortrait from '../../sims.png'
+import Grainient from './Grainient'
 
 const RINGS = [
   { id: 'art', value: 92, Icon: PenTool },
@@ -27,21 +29,6 @@ const EXPERTISE = [
   'Design web',
   'UX / UI',
   'Direction photo',
-]
-
-const ROLES = [
-  {
-    company: 'Studio exemple',
-    role: 'Directrice artistique',
-    dates: '2022 à aujourd’hui',
-    text: 'Texte temporaire. À remplacer par le détail des missions, des livrables et de l’équipe encadrée.',
-  },
-  {
-    company: 'Agence exemple',
-    role: 'Graphiste senior',
-    dates: '2019 à 2022',
-    text: 'Texte temporaire. À remplacer par les projets print, motion et identité menés sur cette période.',
-  },
 ]
 
 const rise = {
@@ -142,65 +129,104 @@ function Ring({
 export function Curriculum() {
   return (
     <section className="cv" id="cv">
-      <div className="cv-stage">
-        <Glass className="cv-rings" index={0}>
-          <p className="cv-kicker">Compétences</p>
-          <div className="cv-rings-grid">
-            {RINGS.map((ring, i) => (
-              <Ring key={ring.id} value={ring.value} Icon={ring.Icon} index={i} />
-            ))}
-          </div>
-        </Glass>
+      <div className="cv-panel" aria-hidden="true">
+        <Grainient
+          color1="#830012"
+          color2="#830012"
+          color3="#830012"
+          timeSpeed={0.25}
+          colorBalance={0.0}
+          warpStrength={1.0}
+          warpFrequency={5.0}
+          warpSpeed={2.0}
+          warpAmplitude={50.0}
+          blendAngle={0.0}
+          blendSoftness={0.05}
+          rotationAmount={500.0}
+          noiseScale={2.0}
+          grainAmount={0.1}
+          grainScale={2.0}
+          grainAnimated={false}
+          contrast={1.5}
+          gamma={1.0}
+          saturation={1.0}
+          centerX={0.0}
+          centerY={0.0}
+          zoom={0.9}
+        />
+      </div>
+      <div className="cv-layout">
+        <motion.div
+          className="cv-sims"
+          initial={{ opacity: 0, y: 28 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.35 }}
+          transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <img src={simsPortrait} alt="" className="cv-sims-img" draggable={false} />
+        </motion.div>
 
-        <Glass className="cv-bio" index={1}>
-          <p className="cv-kicker">À propos</p>
-          <h2>Designer, penseuse, créatrice</h2>
-          <p>
-            Texte temporaire. À remplacer par une courte présentation de
-            Karla, son approche et ce qu’elle aime construire.
-          </p>
-        </Glass>
+        <div className="cv-stage">
+          <div className="cv-stage-col cv-stage-col--primary">
+            <Glass className="cv-bio" index={0}>
+              <p className="cv-kicker">À propos</p>
+              <h2>Designer, penseuse, créatrice</h2>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+              reprehenderit in voluptate velit esse cillum dolore eu fugiat
+              nulla pariatur.
+            </p>
+            <p>
+              Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
+              officia deserunt mollit anim id est laborum. Curabitur pretium
+              tincidunt lacus. Nulla facilisi. Ut convallis, sem sit amet
+              interdum consectetuer, odio augue aliquam leo, nec dapibus tortor
+              nibh sed augue.
+            </p>
+            </Glass>
 
-        <Glass className="cv-expertise" index={2}>
-          <p className="cv-kicker">Expertises</p>
-          <ul>
-            {EXPERTISE.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </Glass>
-
-        <Glass className="cv-tags" index={3}>
-          <p className="cv-kicker">Focus</p>
-          <ul>
-            {TAGS.map((tag, i) => (
-              <motion.li
-                key={tag}
-                initial={{ opacity: 0, x: 12 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 + i * 0.06 }}
-              >
-                <span />
-                {tag}
-              </motion.li>
-            ))}
-          </ul>
-        </Glass>
-
-        {ROLES.map((job, i) => (
-          <Glass key={job.company} className="cv-role" index={5 + i}>
-            <header>
-              <span className="cv-role-mark">K</span>
-              <div className="cv-role-head">
-                <h3>{job.company}</h3>
-                <time>{job.dates}</time>
+            <Glass className="cv-rings" index={2}>
+              <p className="cv-kicker">Compétences</p>
+              <div className="cv-rings-grid">
+                {RINGS.map((ring, i) => (
+                  <Ring key={ring.id} value={ring.value} Icon={ring.Icon} index={i} />
+                ))}
               </div>
-            </header>
-            <p className="cv-role-title">{job.role}</p>
-            <p className="cv-role-text">{job.text}</p>
-          </Glass>
-        ))}
+            </Glass>
+          </div>
+
+          <div className="cv-stage-col cv-stage-col--secondary">
+            <Glass className="cv-tags" index={1}>
+              <p className="cv-kicker">Focus</p>
+              <ul>
+                {TAGS.map((tag, i) => (
+                  <motion.li
+                    key={tag}
+                    initial={{ opacity: 0, x: 12 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.2 + i * 0.06 }}
+                  >
+                    <span />
+                    {tag}
+                  </motion.li>
+                ))}
+              </ul>
+            </Glass>
+
+            <Glass className="cv-expertise" index={3}>
+              <p className="cv-kicker">Expertises</p>
+              <ul>
+                {EXPERTISE.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </Glass>
+          </div>
+        </div>
       </div>
     </section>
   )

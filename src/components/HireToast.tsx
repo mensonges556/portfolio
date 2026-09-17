@@ -1,13 +1,36 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 export function HireToast() {
   const [dismissed, setDismissed] = useState(false)
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const hero = document.getElementById('accueil')
+    if (!hero) return
+
+    const update = () => {
+      const { bottom } = hero.getBoundingClientRect()
+      setVisible(bottom < window.innerHeight * 0.88)
+    }
+
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    window.addEventListener('resize', update)
+    return () => {
+      window.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
+    }
+  }, [])
 
   if (dismissed) return null
 
   return createPortal(
-    <div className="HireToast-fixed" id="contact">
+    <div
+      className={`HireToast-fixed${visible ? ' is-visible' : ''}`}
+      id="contact"
+      aria-hidden={!visible}
+    >
     <div
       className="Toast-root-M1q HireOverlay-toastRoot-M4P Project-projectOverlay-OM0"
       role="alert"

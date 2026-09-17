@@ -1,0 +1,139 @@
+.gooey-nav-container {
+  position: relative;
+  z-index: 2;
+}
+
+.gooey-nav-container nav {
+  display: flex;
+  position: relative;
+}
+
+.gooey-nav-container nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35em 1.25em;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  color: #830012;
+}
+
+.gooey-nav-container nav ul li {
+  border-radius: 100vw;
+  position: relative;
+}
+
+.gooey-nav-container nav ul li a {
+  display: inline-block;
+  padding: 0.55em 0.85em;
+  font-family: Inter, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  color: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+  border-radius: 100vw;
+  transition: color 0.3s ease;
+}
+
+.gooey-nav-container nav ul li a:focus-visible {
+  outline: 2px solid rgba(131, 0, 18, 0.45);
+  outline-offset: 3px;
+}
+
+.gooey-nav-container nav ul li::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 100vw;
+  background: #830012;
+  opacity: 0;
+  transform: scale(0.82);
+  transition:
+    opacity 0.32s ease,
+    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.gooey-nav-container nav ul li.active {
+  color: #fff;
+}
+
+.gooey-nav-container nav ul li.active::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.gooey-nav-burst {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.gooey-nav-burst .particle,
+.gooey-nav-burst .point {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 100%;
+  transform-origin: center;
+  pointer-events: none;
+}
+
+.gooey-nav-burst .particle {
+  --time: 900ms;
+  position: absolute;
+  top: -7px;
+  left: -7px;
+  animation: gooey-particle var(--time) ease 1 both;
+}
+
+.gooey-nav-burst .point {
+  background: var(--color, #830012);
+  animation: gooey-point var(--time) ease 1 both;
+}
+
+@keyframes gooey-particle {
+  0% {
+    transform: rotate(0deg) translate(var(--start-x), var(--start-y));
+    opacity: 1;
+  }
+
+  100% {
+    transform: rotate(var(--rotate)) translate(var(--end-x), var(--end-y));
+    opacity: 0;
+  }
+}
+
+@keyframes gooey-point {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  35% {
+    transform: scale(calc(var(--scale) * 0.45));
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+.gooey-nav-karla {
+  --color-1: #830012;
+  --color-2: #a31828;
+  --color-3: #6b0010;
+  --color-4: #c43a4f;
+}
