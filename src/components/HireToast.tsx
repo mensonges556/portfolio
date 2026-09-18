@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
+import pdpAvatar from '../../pdpbottoms.png'
 
 export function HireToast() {
   const [dismissed, setDismissed] = useState(false)
@@ -23,12 +24,16 @@ export function HireToast() {
     }
   }, [])
 
+  const handleHire = () => {
+    setDismissed(true)
+    window.location.assign('/#contact')
+  }
+
   if (dismissed) return null
 
   return createPortal(
     <div
       className={`HireToast-fixed${visible ? ' is-visible' : ''}`}
-      id="contact"
       aria-hidden={!visible}
     >
     <div
@@ -45,11 +50,9 @@ export function HireToast() {
           >
             <img
               className="AvatarImage-avatarImage-PUL"
-              src="https://pps.services.adobe.com/api/profile/43A00F894C7B49C30A04B839@AdobeID/image/db9536db-18ca-49f5-9ee1-660e3b003b9c/100"
+              src={pdpAvatar}
               alt="Profil appartenant à Karla"
-              srcSet="https://pps.services.adobe.com/api/profile/43A00F894C7B49C30A04B839@AdobeID/image/db9536db-18ca-49f5-9ee1-660e3b003b9c/50 50w, https://pps.services.adobe.com/api/profile/43A00F894C7B49C30A04B839@AdobeID/image/db9536db-18ca-49f5-9ee1-660e3b003b9c/100 100w"
               loading="lazy"
-              sizes="45px"
               draggable={false}
             />
           </a>
@@ -66,6 +69,7 @@ export function HireToast() {
             className="MessageButton-interactionButton-O6g HireOverlay-hireButton-cbb"
             data-id="hire"
             type="button"
+            onClick={handleHire}
           >
             <span className="MessageButton-messageText-Hnz">Engager Karla</span>
           </button>

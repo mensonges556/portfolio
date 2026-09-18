@@ -5,10 +5,10 @@ import simsPortrait from '../../sims.png'
 import Grainient from './Grainient'
 
 const RINGS = [
-  { id: 'art', value: 92, Icon: PenTool },
-  { id: 'paint', value: 80, Icon: Brush },
-  { id: 'ai', value: 80, Icon: Sparkles },
-  { id: 'film', value: 50, Icon: Video },
+  { id: 'art', value: 92, Icon: PenTool, label: 'Graphisme' },
+  { id: 'paint', value: 80, Icon: Brush, label: 'Illustration' },
+  { id: 'ai', value: 80, Icon: Sparkles, label: 'Motion & IA' },
+  { id: 'film', value: 50, Icon: Video, label: 'Vidéo' },
 ]
 
 const TAGS = [
@@ -66,10 +66,12 @@ function Glass({
 
 function Ring({
   value,
+  label,
   Icon,
   index,
 }: {
   value: number
+  label: string
   Icon: typeof PenTool
   index: number
 }) {
@@ -114,7 +116,17 @@ function Ring({
         </svg>
         <Icon strokeWidth={1.6} className="cv-ring-icon" />
       </div>
+      <motion.p
+        className="cv-ring-label"
+        initial={{ opacity: 0, y: 6 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.38 + index * 0.1 }}
+      >
+        {label}
+      </motion.p>
       <motion.span
+        className="cv-ring-pct"
         initial={{ opacity: 0, y: 6 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -163,7 +175,9 @@ export function Curriculum() {
           viewport={{ once: true, amount: 0.35 }}
           transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
         >
-          <img src={simsPortrait} alt="" className="cv-sims-img" draggable={false} />
+          <div className="cv-sims-float">
+            <img src={simsPortrait} alt="" className="cv-sims-img" draggable={false} />
+          </div>
         </motion.div>
 
         <div className="cv-stage">
@@ -182,9 +196,7 @@ export function Curriculum() {
             <p>
               Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
               officia deserunt mollit anim id est laborum. Curabitur pretium
-              tincidunt lacus. Nulla facilisi. Ut convallis, sem sit amet
-              interdum consectetuer, odio augue aliquam leo, nec dapibus tortor
-              nibh sed augue.
+              tincidunt lacus.
             </p>
             </Glass>
 
@@ -192,7 +204,13 @@ export function Curriculum() {
               <p className="cv-kicker">Compétences</p>
               <div className="cv-rings-grid">
                 {RINGS.map((ring, i) => (
-                  <Ring key={ring.id} value={ring.value} Icon={ring.Icon} index={i} />
+                  <Ring
+                    key={ring.id}
+                    value={ring.value}
+                    label={ring.label}
+                    Icon={ring.Icon}
+                    index={i}
+                  />
                 ))}
               </div>
             </Glass>

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import Grainient from './Grainient'
 
 const LOREM =
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
@@ -59,9 +60,35 @@ export function ScrollBand() {
       className="scroll-band"
       aria-hidden="true"
     >
+      <div className="scroll-band-bg" aria-hidden="true">
+        <Grainient
+          color1="#830012"
+          color2="#830012"
+          color3="#830012"
+          timeSpeed={0.25}
+          colorBalance={0.0}
+          warpStrength={1.0}
+          warpFrequency={5.0}
+          warpSpeed={2.0}
+          warpAmplitude={50.0}
+          blendAngle={0.0}
+          blendSoftness={0.05}
+          rotationAmount={500.0}
+          noiseScale={2.0}
+          grainAmount={0.1}
+          grainScale={2.0}
+          grainAnimated={false}
+          contrast={1.5}
+          gamma={1.0}
+          saturation={1.0}
+          centerX={0.0}
+          centerY={0.0}
+          zoom={0.9}
+        />
+      </div>
       <div
         ref={trackRef}
-        className="flex w-max whitespace-nowrap will-change-transform"
+        className="scroll-band-track flex w-max whitespace-nowrap will-change-transform"
         style={{ padding: 'clamp(14px, 3vw, 22px) 0' }}
       >
         {[0, 1].map((copy) => (

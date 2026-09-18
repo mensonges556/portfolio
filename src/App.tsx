@@ -1,7 +1,9 @@
 import { useRef } from 'react'
+import { BelowCvGallery } from './components/BelowCvGallery'
 import { Curriculum } from './components/Curriculum'
 import { DesktopNav } from './components/DesktopNav'
 import { Hero } from './components/Hero'
+import { ContactFooter } from './components/ContactFooter'
 import { HireToast } from './components/HireToast'
 import { ScrollBand } from './components/ScrollBand'
 
@@ -18,6 +20,10 @@ export default function App() {
       />
       <Curriculum />
       <ScrollBand />
+      <div className="cv-page-tail">
+        <BelowCvGallery />
+        <ContactFooter />
+      </div>
       <HireToast />
     </div>
   )

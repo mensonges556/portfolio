@@ -7,4 +7,5 @@ export const NAV = [
 
 export const NAV_SOCIALS = [
   { label: 'Behance', link: 'https://www.behance.net/melamicosa' },
+  { label: 'Instagram', link: 'https://www.instagram.com/karla' },
 ] as const

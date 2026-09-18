@@ -280,7 +280,7 @@ export function Hero({ desktopNavHeaderRef, desktopNavGrabRef }: HeroProps) {
         <div className="h-[64px] sm:h-[72px] shrink-0" />
 
         <div className="hero-shell">
-          <div className="hero-media-slot" id="projets">
+          <div className="hero-media-slot">
             <div className="hero-brand">
               <motion.img
                 src={logoKarla}
