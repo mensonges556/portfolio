@@ -11,7 +11,6 @@ import {
 import logoKarla from '../../Fichier 10.svg'
 import heroPortrait from '../../hero.png'
 import heroBg from '../../3D.png'
-import Grainient from './Grainient'
 import { NAV } from '../config/nav'
 import { LogoMark, BurgerButton, MobileMenu } from './MobileMenu'
 import { Pointer } from './ui/pointer-highlight'
@@ -43,9 +42,14 @@ function pointIn(
 type HeroProps = {
   desktopNavHeaderRef?: RefObject<HTMLElement | null>
   desktopNavGrabRef?: RefObject<HTMLElement | null>
+  onIntroLockChange?: (locked: boolean) => void
 }
 
-export function Hero({ desktopNavHeaderRef, desktopNavGrabRef }: HeroProps) {
+export function Hero({
+  desktopNavHeaderRef,
+  desktopNavGrabRef,
+  onIntroLockChange,
+}: HeroProps) {
   const heroRef = useRef<HTMLDivElement>(null)
   const navElRef = useRef<HTMLElement>(null)
   const navGrabRef = useRef<HTMLDivElement>(null)
@@ -67,6 +71,7 @@ export function Hero({ desktopNavHeaderRef, desktopNavGrabRef }: HeroProps) {
       opacity.set(100)
       setNavReady(true)
       setShowBar(false)
+      onIntroLockChange?.(false)
       const nav = navElRef.current
       const desktopNav = desktopNavHeaderRef?.current
       if (nav) animate(nav, { opacity: 1, x: 0, y: 0 }, { duration: 0 })
@@ -76,6 +81,8 @@ export function Hero({ desktopNavHeaderRef, desktopNavGrabRef }: HeroProps) {
       }
       return
     }
+
+    onIntroLockChange?.(true)
 
     let cancelled = false
     const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
@@ -202,14 +209,17 @@ export function Hero({ desktopNavHeaderRef, desktopNavGrabRef }: HeroProps) {
           },
         ),
       ])
-      if (!cancelled) setShowBar(false)
+      if (!cancelled) {
+        setShowBar(false)
+        onIntroLockChange?.(false)
+      }
     }
 
     void run()
     return () => {
       cancelled = true
     }
-  }, [animate, cursorRef, opacity, desktopNavHeaderRef, desktopNavGrabRef])
+  }, [animate, cursorRef, opacity, desktopNavHeaderRef, desktopNavGrabRef, onIntroLockChange])
 
   return (
     <div
@@ -218,39 +228,14 @@ export function Hero({ desktopNavHeaderRef, desktopNavGrabRef }: HeroProps) {
       className="relative w-full min-w-0 min-h-[100svh] overflow-visible"
     >
       <div className="hero-bg absolute inset-0 z-0" aria-hidden="true">
-        <div className="hero-bg-grain">
-          <Grainient
-            color1="#fc81ff"
-            color2="#d3d3d3"
-            color3="#fc81ff"
-            timeSpeed={0.25}
-            colorBalance={0.0}
-            warpStrength={1.0}
-            warpFrequency={5.0}
-            warpSpeed={2.0}
-            warpAmplitude={50.0}
-            blendAngle={0.0}
-            blendSoftness={0.05}
-            rotationAmount={500.0}
-            noiseScale={2.0}
-            grainAmount={0.1}
-            grainScale={2.0}
-            grainAnimated={false}
-            contrast={1.5}
-            gamma={1.0}
-            saturation={1.0}
-            centerX={0.0}
-            centerY={0.0}
-            zoom={0.9}
+        <motion.div className="hero-3d-decor" style={{ opacity: layerOpacity }}>
+          <img
+            src={heroBg}
+            alt=""
+            className="hero-3d-img"
+            draggable={false}
           />
-        </div>
-        <motion.img
-          src={heroBg}
-          alt=""
-          className="hero-bg-img"
-          draggable={false}
-          style={{ opacity: layerOpacity }}
-        />
+        </motion.div>
       </div>
       <motion.div
         ref={cursorRef}

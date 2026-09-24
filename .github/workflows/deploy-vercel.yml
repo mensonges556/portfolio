@@ -3,7 +3,8 @@
 name: Deploy to Vercel (production)
 
 on:
-  # Enable `push` after adding VERCEL_* secrets (see job env below).
+  push:
+    branches: [main]
   workflow_dispatch:
 
 concurrency:

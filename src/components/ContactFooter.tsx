@@ -37,7 +37,7 @@ export function ContactFooter() {
           blendSoftness={0.12}
           rotationAmount={380.0}
           noiseScale={2.0}
-          grainAmount={0.1}
+          grainAmount={0.055}
           grainScale={2.0}
           grainAnimated={false}
           contrast={1.45}

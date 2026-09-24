@@ -157,7 +157,7 @@ export default function Grainient({
   blendSoftness = 0.05,
   rotationAmount = 500.0,
   noiseScale = 2.0,
-  grainAmount = 0.1,
+  grainAmount = 0.055,
   grainScale = 2.0,
   grainAnimated = false,
   contrast = 1.5,

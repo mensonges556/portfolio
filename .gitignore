@@ -29,3 +29,5 @@ hmm/
 old/
 x/
 inspo/
+.vercel
+.env*
