@@ -35,12 +35,9 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html.hero-scroll-lock,
-html.hero-scroll-lock body,
-html.hero-scroll-lock #root {
+html.hero-scroll-lock body {
   overflow: hidden !important;
   overscroll-behavior: none;
-  height: 100%;
-  max-height: 100dvh;
 }
 
 html, body, #root {
@@ -592,28 +589,9 @@ img {
   left: 50%;
   z-index: 22;
   width: min(1180px, 108vw);
-  transform: translate(-50%, 3.5%);
+  transform: translateX(-50%);
   pointer-events: none;
   user-select: none;
-  animation: hero-peek-float 4.8s ease-in-out infinite;
-  will-change: transform;
-}
-
-@keyframes hero-peek-float {
-  0%,
-  100% {
-    transform: translate(-50%, 3.5%);
-  }
-
-  50% {
-    transform: translate(-50%, calc(3.5% - 10px));
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero-peek-wrap {
-    animation: none;
-  }
 }
 
 .hero-peek {
@@ -998,6 +976,7 @@ img {
 @media (min-width: 900px) {
   .cv {
     --cv-panel-inset: clamp(10px, 1.35vw, 18px);
+    margin-top: clamp(-16px, -2vh, -26px);
   }
 }
 
@@ -1032,6 +1011,10 @@ img {
 .hero-cv-stack > :not(.hero-cv-stack__bg) {
   position: relative;
   z-index: 1;
+}
+
+.hero-cv-stack > #accueil {
+  z-index: 2;
 }
 
 .cv-panel {
@@ -1405,9 +1388,22 @@ img {
 }
 
 @media (max-width: 899px) {
+  .hero-cv-stack__grain {
+    display: none;
+  }
+
+  .hero-cv-stack__bg {
+    background: linear-gradient(
+      180deg,
+      #fc81ff 0%,
+      #ffc9ec 38%,
+      #f5efef 100%
+    );
+  }
+
   .cv {
     --cv-panel-inset: 0;
-    margin-top: 0;
+    margin-top: clamp(-10px, -2vw, -16px);
     padding: clamp(40px, 10vw, 64px) 14px 88px;
   }
 

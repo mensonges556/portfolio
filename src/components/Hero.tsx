@@ -87,20 +87,47 @@ export function Hero({
     let cancelled = false
     const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
+    const finishIntroFallback = () => {
+      if (cancelled) return
+      opacity.set(100)
+      setNavReady(true)
+      setShowBar(false)
+      onIntroLockChange?.(false)
+      const mobileNav = window.matchMedia('(max-width: 899px)').matches
+      const nav = mobileNav ? navElRef.current : desktopNavHeaderRef?.current ?? null
+      if (nav) {
+        nav.style.pointerEvents = ''
+        void animate(nav, { opacity: 1, x: 0, y: 0 }, { duration: 0 })
+      }
+    }
+
     const run = async () => {
       await wait(280)
-      await new Promise((r) => requestAnimationFrame(() => r(null)))
 
-      const hero = heroRef.current
-      const cursor = cursorRef.current
+      let hero = heroRef.current
+      let cursor = cursorRef.current
+      let panel = panelRef.current
+      let track = trackRef.current
+
+      for (let attempt = 0; attempt < 40 && !cancelled; attempt += 1) {
+        hero = heroRef.current
+        cursor = cursorRef.current
+        panel = panelRef.current
+        track = trackRef.current
+        if (hero && cursor && panel && track) break
+        await wait(50)
+      }
+
       const mobileNav = window.matchMedia('(max-width: 899px)').matches
       const nav = mobileNav ? navElRef.current : desktopNavHeaderRef?.current ?? null
       const navGrab = mobileNav
         ? navGrabRef.current
         : desktopNavGrabRef?.current ?? null
-      const panel = panelRef.current
-      const track = trackRef.current
-      if (!hero || !cursor || !panel || !track || cancelled) return
+
+      if (!hero || !cursor || !panel || !track || cancelled) {
+        finishIntroFallback()
+        return
+      }
 
       if (nav) {
         nav.style.pointerEvents = 'none'
@@ -225,7 +252,7 @@ export function Hero({
     <div
       id="accueil"
       ref={heroRef}
-      className="relative w-full min-w-0 min-h-[100svh] overflow-visible"
+      className="relative w-full min-w-0 min-h-[100svh] overflow-hidden"
     >
       <div className="hero-bg absolute inset-0 z-0" aria-hidden="true">
         <motion.div className="hero-3d-decor" style={{ opacity: layerOpacity }}>
